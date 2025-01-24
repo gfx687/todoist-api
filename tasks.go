@@ -8,17 +8,15 @@ import (
 	"net/http"
 )
 
-func GetTasksByProject(projectId string) ([]Task, error) {
-	client := getHttpClient()
-
+func (todoistClient *TodoistClient) GetTasksByProject(projectId string) ([]Task, error) {
 	req, err := http.NewRequest("GET", "https://api.todoist.com/rest/v2/tasks?project_id="+projectId, nil)
 	if err != nil {
 		return nil, fmt.Errorf("error while creating a new HTTP request: %w", err)
 	}
 
-	req.Header.Set("Authorization", "Bearer "+todoistToken)
+	req.Header.Set("Authorization", "Bearer "+todoistClient.token)
 
-	res, err := client.Do(req)
+	res, err := todoistClient.httpClient.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("error while making an HTTP request: %w", err)
 	}
@@ -43,17 +41,15 @@ func GetTasksByProject(projectId string) ([]Task, error) {
 	return tasks, nil
 }
 
-func GetTasksByLabel(label string) ([]Task, error) {
+func (todoistClient *TodoistClient) GetTasksByLabel(label string) ([]Task, error) {
 	req, err := http.NewRequest("GET", "https://api.todoist.com/rest/v2/tasks?label="+label, nil)
 	if err != nil {
 		return nil, fmt.Errorf("error while creating a new HTTP request: %w", err)
 	}
 
-	req.Header.Set("Authorization", "Bearer "+todoistToken)
+	req.Header.Set("Authorization", "Bearer "+todoistClient.token)
 
-	client := getHttpClient()
-
-	res, err := client.Do(req)
+	res, err := todoistClient.httpClient.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("error while making an HTTP request: %w", err)
 	}
@@ -77,7 +73,7 @@ func GetTasksByLabel(label string) ([]Task, error) {
 	return tasks, nil
 }
 
-func CreateTask(content string, description string, dueString string) error {
+func (todoistClient *TodoistClient) CreateTask(content string, description string, dueString string) error {
 	task := TaskCreate{
 		Content:     content,
 		Description: description,
@@ -97,12 +93,10 @@ func CreateTask(content string, description string, dueString string) error {
 		return fmt.Errorf("error while creating a new HTTP request: %w", err)
 	}
 
-	req.Header.Set("Authorization", "Bearer "+todoistToken)
+	req.Header.Set("Authorization", "Bearer "+todoistClient.token)
 	req.Header.Set("Content-Type", "application/json")
 
-	client := getHttpClient()
-
-	res, err := client.Do(req)
+	res, err := todoistClient.httpClient.Do(req)
 	if err != nil {
 		return fmt.Errorf("error while making an HTTP request: %w", err)
 	}

@@ -7,17 +7,15 @@ import (
 	"net/http"
 )
 
-func GetProjectList() ([]Project, error) {
-	client := getHttpClient()
-
+func (todoistClient *TodoistClient) GetProjectList() ([]Project, error) {
 	req, err := http.NewRequest("GET", "https://api.todoist.com/rest/v2/projects", nil)
 	if err != nil {
 		return nil, fmt.Errorf("error while creating a new HTTP request: %w", err)
 	}
 
-	req.Header.Set("Authorization", "Bearer "+todoistToken)
+	req.Header.Set("Authorization", "Bearer "+todoistClient.token)
 
-	res, err := client.Do(req)
+	res, err := todoistClient.httpClient.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("error while making an HTTP request: %w", err)
 	}
